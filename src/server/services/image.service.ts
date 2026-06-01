@@ -3480,7 +3480,7 @@ export async function getImagesFromSearchPreFilter(input: ImageSearchInput) {
         };
       });
 
-      endTimer();
+      try { endTimer(); } catch {}
 
       return { data: fullData, nextCursor };
     }
@@ -3601,7 +3601,7 @@ export async function getImagesFromSearchPreFilter(input: ImageSearchInput) {
       };
     });
 
-    endTimer();
+    try { endTimer(); } catch {}
 
     return {
       data: fullData,
@@ -3620,7 +3620,7 @@ export async function getImagesFromSearchPreFilter(input: ImageSearchInput) {
       'temp-search'
     ).catch();
 
-    endTimer();
+    try { endTimer(); } catch {}
     // Let the error bubble up to tRPC. The client detects isError on the
     // infinite query and renders the retry banner — same path that handles any
     // other backend failure (API down, network blip, etc.).
@@ -4417,9 +4417,9 @@ export async function getImagesFromSearchPostFilter(input: ImageSearchInput) {
 
     // Record PostFilter metrics
     const overallFilterRatio = totalProcessed > 0 ? 1 - accumulatedHits.length / totalProcessed : 0;
-    postFilterIterations.observe({ route }, iteration);
+    try { postFilterIterations.observe({ route }, iteration); } catch {}
     postFilterDocsProcessed.inc({ route }, totalProcessed);
-    postFilterFilterRatio.observe({ route }, overallFilterRatio);
+    try { postFilterFilterRatio.observe({ route }, overallFilterRatio); } catch {}
 
     // Merge user-own hits from the second-pass into the accumulated results.
     // Second pass is unscoped (cacheable) — narrow it to the current view here,
@@ -4501,7 +4501,7 @@ export async function getImagesFromSearchPostFilter(input: ImageSearchInput) {
         };
       });
 
-      endTimer();
+      try { endTimer(); } catch {}
 
       return { data: fullData, nextCursor };
     }
@@ -4626,7 +4626,7 @@ export async function getImagesFromSearchPostFilter(input: ImageSearchInput) {
       };
     });
 
-    endTimer();
+    try { endTimer(); } catch {}
 
     return { data: fullData, nextCursor };
   } catch (error) {
@@ -4641,7 +4641,7 @@ export async function getImagesFromSearchPostFilter(input: ImageSearchInput) {
       },
       'temp-search'
     ).catch();
-    endTimer();
+    try { endTimer(); } catch {}
 
     throw err;
   }

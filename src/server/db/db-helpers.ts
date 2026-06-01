@@ -165,10 +165,14 @@ export function getClient(
       const cb = args[0] as (err: Error | undefined, client: any, done: any) => void;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (originalConnect as any)((err: Error | undefined, client: any, done: any) => {
-        pgPoolAcquireHistogram.observe(
-          { pool: instance, result: err ? 'err' : 'ok' },
-          elapsedSeconds()
-        );
+        try {
+          pgPoolAcquireHistogram.observe(
+            { pool: instance, result: err ? 'err' : 'ok' },
+            elapsedSeconds()
+          );
+        } catch {
+          // intentionally swallowed to prevent breaking DB connections
+        }
         cb(err, client, done);
       });
     }
@@ -178,11 +182,15 @@ export function getClient(
     return (originalConnect as any)(...args).then(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (conn: any) => {
-        pgPoolAcquireHistogram.observe({ pool: instance, result: 'ok' }, elapsedSeconds());
+        try {
+          pgPoolAcquireHistogram.observe({ pool: instance, result: 'ok' }, elapsedSeconds());
+        } catch {}
         return conn;
       },
       (e: unknown) => {
-        pgPoolAcquireHistogram.observe({ pool: instance, result: 'err' }, elapsedSeconds());
+        try {
+          pgPoolAcquireHistogram.observe({ pool: instance, result: 'err' }, elapsedSeconds());
+        } catch {}
         throw e;
       }
     );
